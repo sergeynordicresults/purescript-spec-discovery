@@ -21,8 +21,7 @@ discover :: ∀ m. MonadAff m => String -> m (Spec Unit)
 discover pattern = do
   runDiscover <- liftEffect $ runEffectFn1 getSpecs pattern
   specs <- liftAff $ fromEffectFnAff runDiscover
-  let specsWrappedInDescribe = map (\{ name, spec } -> describe name spec) specs
-  pure $ sequence_ specsWrappedInDescribe
+  pure $ sequence_ $ specs <#> \{ name, spec } -> describe name spec
 
 discoverAndRunSpecs :: Array Reporter -> String -> Effect Unit
 discoverAndRunSpecs reporters pattern = launchAff_ do
